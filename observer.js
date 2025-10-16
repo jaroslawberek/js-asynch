@@ -16,23 +16,22 @@ class EventEmitter {
     this.listeners[event] = this.listeners[event].filter((l) => l.callback !== callback);
   }
 
-  emit(event, args) {
+  async emit(event, args) {
     if (!this.listeners[event]) return;
-    const current = [...this.listeners[event]];
-    current.forEach(async (listener) => {
+    const listners = [...this.listeners[event]];
+    for (const listener of listners) {
       try {
         const result = listener.callback.call(listener.obj, args);
         if (result instanceof Promise) await result;
         if (listener.isOnce) this.off(event, listener.callback);
       } catch (err) {
         if (event !== "error") {
-          this.emit("error", { event, err });
+          this.emit("Error z emitera: ", { event, err });
         } else {
           console.error("[EventEmitter] Błąd w listenerze błędu:", err);
         }
       }
-    });
-    // console.log(this.listeners);
+    }
   }
 }
 
@@ -44,7 +43,7 @@ class Player extends EventEmitter {
     this.width = width;
     this.height = height;
     this.status = "plaing";
-    this.on("error", (err) => console.warn("Wystąpił błąd:", err));
+    this.on("error", this, (err) => console.warn("Wystąpił błąd obsłuzony w playerze:", err));
   }
 
   move(x, y) {
@@ -74,8 +73,14 @@ class Hud {
     };
 
     this.onChangeStatus = function (args) {
-      throw new Error("Nie mogę zaktualizować statusu!");
-      console.log("Change Status: " + args.oldStatus + " zmieniono na " + args.newStatus);
+      ss;
+      return new Promise((reslove, reject) => {
+        setTimeout(() => {
+          reject("Nie mogę zaktualizować statusu!");
+          //  reslove("Change Status: " + args.oldStatus + " zmieniono na " + args.newStatus);
+        }, 2000);
+      });
+      //throw new Error("Nie mogę zaktualizować statusu!");
     };
   }
 
